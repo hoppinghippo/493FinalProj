@@ -28,7 +28,7 @@ public class ButtonGrid extends JPanel{
       ++letter;
     }
   }
-  
+  //comment for git
   class ButtonPanel extends JPanel implements ActionListener{
     
     JButton button;
