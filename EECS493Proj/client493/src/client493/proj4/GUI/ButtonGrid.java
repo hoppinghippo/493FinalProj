@@ -28,11 +28,7 @@ public class ButtonGrid extends JPanel{
       ++letter;
     }
   }
-<<<<<<< HEAD:EECS493Proj/client493/src/client493/proj4/GUI/ButtonGrid.java
-  
-=======
 
->>>>>>> origin/master:EECS493Proj/src/eecs285/proj4/GUI/ButtonGrid.java
   class ButtonPanel extends JPanel implements ActionListener{
     
     JButton button;
