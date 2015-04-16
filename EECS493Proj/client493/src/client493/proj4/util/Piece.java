@@ -26,17 +26,21 @@ public class Piece {
 			case 0:
 				defaultShape[0][0] = true;
 				defaultShape[0][1] = true;
-				width = 2;
+				defaultShape[0][2] = true;
+				defaultShape[0][3] = true;
+				defaultShape[0][4] = true;
+				width = 5;
 				height = 1;
-				val = 2;
+				val = 5;
 				break;
 			case 1:
 				defaultShape[0][0] = true;
 				defaultShape[0][1] = true;
 				defaultShape[0][2] = true;
-				width = 3;
+				defaultShape[0][3] = true;
+				width = 4;
 				height = 1;
-				val = 3;
+				val = 4;
 				break;
 			case 2:
 				defaultShape[0][0] = true;
@@ -50,20 +54,16 @@ public class Piece {
 				defaultShape[0][0] = true;
 				defaultShape[0][1] = true;
 				defaultShape[0][2] = true;
-				defaultShape[0][3] = true;
-				width = 4;
+				width = 3;
 				height = 1;
-				val = 4;
+				val = 3;
 				break;
 			case 4:
 				defaultShape[0][0] = true;
 				defaultShape[0][1] = true;
-				defaultShape[0][2] = true;
-				defaultShape[0][3] = true;
-				defaultShape[0][4] = true;
-				width = 5;
+				width = 2;
 				height = 1;
-				val = 5;
+				val = 2;
 				break;
 		}
 		defWidth = width;
@@ -193,53 +193,53 @@ public class Piece {
 		}
 	}
 	
-	// //This function rotates currentShape counterclockwise
-	// public void rotateCounterClockwise(){
-	// 	boolean temp[][] = new boolean[PIECE_SIZE][PIECE_SIZE];
-	// 	for(int i = 0; i < PIECE_SIZE; ++i){
-	// 		for(int j = 0; j < PIECE_SIZE; ++j){
-	// 			temp[i][j] = currentShape[j][PIECE_SIZE-i-1];
-	// 		}
-	// 	}
-	// 	currentShape = temp;
-	// 	while(shiftUp());
-	// 	int tmp = width;
-	// 	width = height;
-	// 	height = tmp;
-	// 	switch (state){
-	// 		case 0: state = 3; break;
-	// 		case 1: state = 0; break;
-	// 		case 2: state = 1; break;
-	// 		case 3: state = 2; break;
-	// 		case 4: state = 7; break;
-	// 		case 5: state = 4; break;
-	// 		case 6: state = 5; break;
-	// 		case 7: state = 6; break;
-	// 	}
-	// }
+	//This function rotates currentShape counterclockwise
+	public void rotateCounterClockwise(){
+		boolean temp[][] = new boolean[PIECE_SIZE][PIECE_SIZE];
+		for(int i = 0; i < PIECE_SIZE; ++i){
+			for(int j = 0; j < PIECE_SIZE; ++j){
+				temp[i][j] = currentShape[j][PIECE_SIZE-i-1];
+			}
+		}
+		currentShape = temp;
+		while(shiftUp());
+		int tmp = width;
+		width = height;
+		height = tmp;
+		switch (state){
+			case 0: state = 3; break;
+			case 1: state = 0; break;
+			case 2: state = 1; break;
+			case 3: state = 2; break;
+			case 4: state = 7; break;
+			case 5: state = 4; break;
+			case 6: state = 5; break;
+			case 7: state = 6; break;
+		}
+	}
 	
-	// //This function flips currentShape across horizontal axis
-	// public void flipHorizontalAxis(){
-	// 	boolean temp;
-	// 	for(int i = 0; i < PIECE_SIZE/2; ++i){
-	// 		for(int j = 0; j < PIECE_SIZE; ++j){
-	// 			temp = currentShape[i][j];
-	// 			currentShape[i][j] = currentShape[PIECE_SIZE-i-1][j];
-	// 			currentShape[PIECE_SIZE-i-1][j] = temp;
-	// 		}
-	// 	}
-	// 	while(shiftUp());
-	// 	switch (state){
-	// 		case 0: state = 6; break;
-	// 		case 1: state = 5; break;
-	// 		case 2: state = 4; break;
-	// 		case 3: state = 7; break;
-	// 		case 4: state = 2; break;
-	// 		case 5: state = 1; break;
-	// 		case 6: state = 0; break;
-	// 		case 7: state = 3; break;
-	// 	}
-	// }
+	//This function flips currentShape across horizontal axis
+	public void flipHorizontalAxis(){
+		boolean temp;
+		for(int i = 0; i < PIECE_SIZE/2; ++i){
+			for(int j = 0; j < PIECE_SIZE; ++j){
+				temp = currentShape[i][j];
+				currentShape[i][j] = currentShape[PIECE_SIZE-i-1][j];
+				currentShape[PIECE_SIZE-i-1][j] = temp;
+			}
+		}
+		while(shiftUp());
+		switch (state){
+			case 0: state = 6; break;
+			case 1: state = 5; break;
+			case 2: state = 4; break;
+			case 3: state = 7; break;
+			case 4: state = 2; break;
+			case 5: state = 1; break;
+			case 6: state = 0; break;
+			case 7: state = 3; break;
+		}
+	}
 
 	
 	//Network stuff on a piece

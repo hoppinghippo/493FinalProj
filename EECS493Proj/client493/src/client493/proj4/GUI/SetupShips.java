@@ -2,7 +2,7 @@ package client493.proj4.GUI;
 
 import client493.proj4.ships.*;
 import client493.proj4.player.*;
-import client493.proj4.util.Constants;
+import client493.proj4.util.*;
 
 import javax.swing.*;
 
@@ -16,6 +16,7 @@ public class SetupShips extends JFrame {
   private DefaultListModel<String> shipListModel;
   private JList<String> shipList;
   private JScrollPane shipScrollPane;
+  private  JLayeredPane boardPanel;
   // private JTextArea shipTextArea;
   private int shipIndex;
   private String selected;
@@ -34,6 +35,15 @@ public class SetupShips extends JFrame {
   //ship control
   private JButton rotate;
   private JButton set;
+  private Board board;
+  private ImageDrag currentPiece;
+  private Piece[] pieces;
+  private Piece piece;
+
+  //button
+  public char rotation = 'r';
+  public int shipSize;
+  public ButtonPanel currentButton = null;
   
   private JLabel search = new JLabel("", SwingConstants.LEFT);
   
@@ -45,10 +55,17 @@ public class SetupShips extends JFrame {
     buttonIndex = -1;
     selected = "";
     player = inPlayer;
+    currentPiece = null;
+    piece = null;
+    board = new Board();
     
     //create ship list
     shipListModel = addShips();
     shipList = new JList<String>(shipListModel);
+    pieces = new Piece[5];
+    for(int i=0; i<5; i++){
+    	pieces[i] = new Piece(i,'r');
+    }
     
     setLayout(new BoxLayout(getContentPane(), BoxLayout.PAGE_AXIS));
     
@@ -91,24 +108,70 @@ public class SetupShips extends JFrame {
     ready.addActionListener(new ReadyListener());
     ready.setEnabled(false);
     
-    JPanel buttonGrid = new JPanel();
-    buttonGrid.setLayout(new GridLayout(10,10));
-    char letter = 'A';
-    for(int i = 0; i < 10; ++i){
-      for(int j = 0; j < 10; ++j){
-        ButtonPanel bp = new ButtonPanel(letter, j);
-        buttonPanels.add(bp);
-        buttonGrid.add(bp);
-      }
-      ++letter;
-    }
+    rotate = new JButton("Rotate (R)");
+    rotate.setFont(new Font("Sans Serif", Font.PLAIN, 13));
+    rotate.addActionListener(new RotateListener());
+    rotate.setEnabled(false);
     
+    set = new JButton("Set Ship(Return)");
+    set.setFont(new Font("Sans Serif", Font.PLAIN, 13));
+    set.addActionListener(new SetListener());
+    set.setEnabled(false);
+    
+    //new bps
+      //    JPanel buttonGrid = new JPanel();
+      //    buttonGrid.setLayout(new GridLayout(10,10));
+      //    char letter = 'A';
+      //    for(int i = 0; i < 10; ++i){
+      //      for(int j = 0; j < 10; ++j){
+      //        ButtonPanel bp = new ButtonPanel(letter, j);
+      //        buttonGrid.add(bp);
+      //      }
+      //      ++letter;
+      //    }
+      //
+      //    boardPanel = new JLayeredPane();
+      //    boardPanel.setPreferredSize(buttonGrid.getPreferredSize());
+      //    boardPanel.add(buttonGrid, JLayeredPane.DEFAULT_LAYER);
+
+      //    boardPanel = new JLayeredPane();
+      //    boardPanel.setLayout(new GridLayout(10,10));
+      //    char letter = 'A';
+      //    for(int i = 0; i < 10; ++i){
+      //      for(int j = 0; j < 10; ++j){
+      //        ButtonPanel bp = new ButtonPanel(letter, j);
+      //        buttonPanels.add(bp);
+      //        boardPanel.add(bp, JLayeredPane.DEFAULT_LAYER);
+      //      }
+      //      ++letter;
+      //    }
+          
+      //    Box gridBox = new Box(BoxLayout.Y_AXIS);
+      //    JPanel gridLabelPanel = new JPanel();
+      //    gridLabelPanel.setOpaque(false);
+      //    gridLabelPanel.add(gridLabel);
+      //    gridBox.add(gridLabelPanel);
+      //    gridBox.add(boardPanel);
+        
     Box shipListBox = new Box(BoxLayout.Y_AXIS);
     JPanel shipLabelPanel = new JPanel();
     shipLabelPanel.setOpaque(false);
     shipLabelPanel.add(shipLabel);
     shipListBox.add(shipLabelPanel);
     shipListBox.add(shipScrollPane);
+    
+    //old bp
+  	JPanel buttonGrid = new JPanel();
+  	buttonGrid.setLayout(new GridLayout(10,10));
+  	char letter = 'A';
+  	for(int i = 0; i < 10; ++i){
+  	  for(int j = 0; j < 10; ++j){
+  	    ButtonPanel bp = new ButtonPanel(letter, j, this);
+  	    buttonPanels.add(bp);
+  	    buttonGrid.add(bp);
+  	  }
+  	  ++letter;
+  	}
     
     Box gridBox = new Box(BoxLayout.Y_AXIS);
     JPanel gridLabelPanel = new JPanel();
@@ -134,9 +197,13 @@ public class SetupShips extends JFrame {
     buttonBox.add(clear);
     buttonBox.add(random);
     buttonBox.add(ready);
+    buttonBox.add(rotate);
+    buttonBox.add(set);
     clear.setAlignmentX(CENTER_ALIGNMENT);
     random.setAlignmentX(CENTER_ALIGNMENT);
     ready.setAlignmentX(CENTER_ALIGNMENT);
+    rotate.setAlignmentX(CENTER_ALIGNMENT);
+    set.setAlignmentX(CENTER_ALIGNMENT);
     
     Box frameBox = new Box(BoxLayout.X_AXIS);
     frameBox.add(leftBox);
@@ -148,8 +215,31 @@ public class SetupShips extends JFrame {
                                                  .getClassLoader()
                                                  .getResource(imagePath)));
     background.add(frameBox);
-    background.setLayout(new FlowLayout());
+    background.setLayout(new FlowLayout()); 
     setContentPane(background);    
+    
+    //Adding Key Stroke Listeners
+    ActionMap actionMap = background.getActionMap();
+    InputMap inputMap = background.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+
+    //Rotate Clockwise
+    inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_R, 0), "R");
+    actionMap.put("R", new AbstractAction() {
+    public void actionPerformed(ActionEvent arg0) {
+        if(rotate.isEnabled()){
+          rotate.doClick();
+        }
+      }
+    });
+    //ENTER
+    inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "ENTER");
+    actionMap.put("ENTER", new AbstractAction() {
+      public void actionPerformed(ActionEvent arg0) {
+        if(set.isEnabled()){
+    	    set.doClick();
+        }
+      }
+    });
   }
   
   public DefaultListModel<String> addShips(){
@@ -168,9 +258,8 @@ public class SetupShips extends JFrame {
       if(e.getSource() == ready){
         boolean ocean[] = player.getPlayerOcean();
         for(int j = 0; j < 100; ++j){
-          if(buttonPanels.get(j).getBackground().equals(Constants.RED)){
+          if(buttonPanels.get(j).getBackground().equals(Constants.GREY)){
             ocean[j] = true;
-            buttonPanels.get(j).setBackground(Constants.GREY);
           }
         }
         player.getAircraft().setLocations();
@@ -440,7 +529,7 @@ public class SetupShips extends JFrame {
         for(int i = 0; i < 100; ++i){
           if(ocean[i]){
             buttonPanels.get(i).setEnabled(false);
-            buttonPanels.get(i).setBackground(Constants.RED);
+            buttonPanels.get(i).setBackground(Constants.GREY);
           }
         }
         invalidate();
@@ -449,25 +538,76 @@ public class SetupShips extends JFrame {
       }
     }
   }
+
+  // //new rotate
+    // public class RotateListener implements ActionListener{
+    //   public void actionPerformed(ActionEvent e){
+    //     if(e.getSource() == rotate){
+    //       currentPiece.ImageDragRC();
+    //       invalidate();
+    //       validate();
+    //       repaint();
+    //     }
+    //   }
+    // }
+
+  //new rotate
+  public class RotateListener implements ActionListener{
+    public void actionPerformed(ActionEvent e){
+      if(e.getSource() == rotate){
+        currentButton.rotate();
+        invalidate();
+        validate();
+        repaint();
+      }
+    }
+  }
+  
+  public class SetListener implements ActionListener{
+	    public void actionPerformed(ActionEvent e){
+	      if(e.getSource() == set){
+	        set.setEnabled(false);
+          rotate.setEnabled(false);
+	        currentButton.setShip();
+
+          invalidate();
+	        validate();
+	        repaint();
+
+	      }
+	    }
+	}
   
   public class MouseListener extends MouseAdapter{
     public void mouseClicked(MouseEvent e){
       if(e.getClickCount() == 1){
         shipIndex = shipList.locationToIndex(e.getPoint());
-      }
-      else if (e.getClickCount() == 2)
-      {
-        JList<String> templist = (JList)e.getSource();
-        //doubleClick = new DoubleClickShipDialog(templist.getSelectedValue());
+        
+      //        System.out.println("Piece Num Clicked: " + shipIndex);
+      //		if(currentPiece != null){
+      //			boardPanel.remove(currentPiece);
+      //			currentPiece.reset();
+      //			currentPiece = null;
+      //		}
+      //		piece = pieces[shipIndex];
+      //		System.out.println(piece);
+      //	    currentPiece = new ImageDrag(piece, 5, set, board);
+      //	    currentPiece.setSize(10, 10);
+      //	    boardPanel.add(currentPiece, JLayeredPane.DRAG_LAYER);
+      //	    boardPanel.moveToFront(currentPiece);
+      //	    rotate.setEnabled(true);
+      //	    currentPieceNum = shipIndex;
       }
     }
   }
   
   public class ButtonPanel extends JPanel implements ActionListener{
     
-    private JButton button;
+    public JButton button;
+    private SetupShips setup;
     
-    public ButtonPanel(char letter, int number){
+    public ButtonPanel(char letter, int number, SetupShips setup){
+      this.setup = setup;
       setBorder(BorderFactory.createLineBorder(Constants.LIGHT_BLUE));
       setBackground(Constants.DARK_BLUE);
       button = new JButton(letter + String.valueOf(number));
@@ -478,13 +618,112 @@ public class SetupShips extends JFrame {
       button.addActionListener(this);
       add(button);
     }
+
+    public void layoutShip(char r, JButton b){
+      int size = setup.shipSize;
+      boolean bad = false, out = false;
+      
+      if(button == b){  
+        for(int k=0; k<size && !out; k++)
+        {
+          System.out.println(k);
+          System.out.println(rotation);
+          
+          switch(rotation){
+          case 'r':
+              //next spot is in dif row
+              if((int)((k+1 + buttonIndex)/10) != (int)(buttonIndex/10)
+                 && k+1 <= size-1){
+                out = true;
+                buttonPanels.get(buttonIndex+k).setBackground(Constants.RED);
+              }
+              //current spot taken
+              else if(buttonPanels.get(buttonIndex+k).getBackground().equals(Constants.GREY)){
+                bad = true;
+                buttonPanels.get(buttonIndex+k).setBackground(Constants.RED);
+              }
+              //good spot
+              else if(!bad){
+                buttonPanels.get(buttonIndex+k).setBackground(Constants.GREEN);
+              }
+              break;
+          case 'd':
+              //next spot is in dif row
+        	  int nextSpot = (k+1)*10 + buttonIndex;
+        	  int col = ((int)((k+1)*10 + buttonIndex)/10)*10;
+        	  System.out.println(nextSpot + " " + col + " " + buttonIndex + " " + ((int)(buttonIndex/10))*10);
+              if(nextSpot >= 100
+            		  && k+1 <= size-1){
+            	out = true;
+                buttonPanels.get(buttonIndex+k*10).setBackground(Constants.RED);
+              }
+              //current spot taken
+              else if(buttonPanels.get(buttonIndex+k*10).getBackground().equals(Constants.GREY)){
+                bad = true;
+                buttonPanels.get(buttonIndex+k*10).setBackground(Constants.RED);
+              }
+              //good spot
+              else if(!bad){
+                buttonPanels.get(buttonIndex+k*10).setBackground(Constants.GREEN);
+              }
+              break;
+          default: break;
+          }
+        }
+        set.setEnabled(!bad);
+      }
+
+      if(shipListModel.isEmpty()){
+        ready.setEnabled(true);
+      }
+    }
     
     public void reset(){
       for(int i = 0; i < 100; ++i){
-        if(!buttonPanels.get(i).getBackground().equals(Constants.RED)){
+        if(!buttonPanels.get(i).getBackground().equals(Constants.GREY)){
           buttonPanels.get(i).setBackground(Constants.DARK_BLUE);
         }
       }
+    }
+
+    public void rotate(){
+      switch(setup.rotation){
+        case 'r': setup.rotation = 'd'; break;
+        case 'd': setup.rotation = 'r'; break;
+      }
+      layoutShip(setup.rotation, setup.currentButton.button);
+    }
+
+    public void setShip(){
+      if(rotation == 'd'){
+        setIndices(selected, buttonIndex, buttonIndex + (shipSize - 1) * 10);
+        for(int r = 0; r < shipSize * 10; r += 10){
+          buttonPanels.get(buttonIndex + r).setBackground(Constants.GREY);
+        }
+      }
+      else{
+        setIndices(selected, buttonIndex, buttonIndex + (shipSize - 1));
+        for(int r = 0; r < shipSize; r++){
+          buttonPanels.get(buttonIndex + r).setBackground(Constants.GREY);
+        }
+      }
+
+      for(int x = 0; x < shipListModel.getSize(); ++x){
+      @SuppressWarnings("unused")
+      String test = shipListModel.elementAt(x);
+        if(shipListModel.elementAt(x) == selected){
+          shipListModel.remove(x);
+          selected = "";
+          shipIndex = -1;
+        }
+      }
+
+      reset();
+      currentButton = null;
+      invalidate();
+      validate();
+      repaint();
+
     }
     
     public void setIndices(String selected, int start, int end){
@@ -512,13 +751,17 @@ public class SetupShips extends JFrame {
       
       JButton buttoning = ((JButton) e.getSource());
       String position = buttoning.getActionCommand();
+      if(currentButton != null)
+        reset();
+      currentButton = this;
       
-      int i = position.charAt(0) - 'A' + 1;
+      int i = position.charAt(0) - 'A';
       int j = Integer.parseInt(position.substring(1));
-      buttonIndex = (10 * (i - 1)) + j;
+      buttonIndex = (10 * (i)) + j;
       int size = 0;
       if(shipIndex > -1){
         selected = shipListModel.elementAt(shipIndex);
+        rotate.setEnabled(true);
       }
       else{
         return;
@@ -541,218 +784,258 @@ public class SetupShips extends JFrame {
       else{
         return;
       }
+      setup.shipSize = size;
+      layoutShip(setup.rotation, button);
       
-      if(button == buttoning){  
-        //button is valid ship end spot
-        if(buttonPanels.get(buttonIndex)
-                       .getBackground()
-                       .equals(Constants.GREEN))
-        {
-          if(buttonIndex + size - 1 < 100 &&
-             buttonPanels.get(buttonIndex + size - 1)
-                         .getBackground()
-                         .equals(Constants.GREEN))
-          {
-            setIndices(selected, buttonIndex, buttonIndex + size - 1);
-            for(int r = 0; r < size; ++r)
-            {
-              buttonPanels.get(buttonIndex + r).setBackground(Constants.RED);
-            }
-            invalidate();
-            validate();
-            repaint();
-          }
-          
-          else if(buttonIndex - size + 1 >= 0 &&
-                  buttonPanels.get(buttonIndex - size + 1)
-                              .getBackground()
-                              .equals(Constants.GREEN))
-          {
-            setIndices(selected, buttonIndex, buttonIndex - size + 1);
-            for(int r = 0; r < size; ++r){
-              buttonPanels.get(buttonIndex - r).setBackground(Constants.RED);
-            }
-            invalidate();
-            validate();
-            repaint();
-          }
-          
-          else if(buttonIndex + (size - 1) * 10 < 100 &&
-                  buttonPanels.get(buttonIndex + (size - 1) * 10)
-                              .getBackground()
-                              .equals(Constants.GREEN))
-          {
-            setIndices(selected, buttonIndex, buttonIndex + (size - 1) * 10);
-            for(int r = 0; r < size * 10; r += 10){
-              buttonPanels.get(buttonIndex + r).setBackground(Constants.RED);
-            }
-            invalidate();
-            validate();
-            repaint();
-          }
-          
-          else if(buttonIndex - (size - 1) * 10 >= 0 &&
-                  buttonPanels.get(buttonIndex - (size - 1) * 10)
-                              .getBackground()
-                              .equals(Constants.GREEN))
-          {
-            setIndices(selected, buttonIndex, buttonIndex - (size - 1) * 10);
-            for(int r = 0; -size * 10 < r; r -= 10){
-              buttonPanels.get(buttonIndex + r).setBackground(Constants.RED);
-            }
-            invalidate();
-            validate();
-            repaint();
-          }
-          
-          for(int z = 0; z < 100; ++z){
-            if(!(buttonPanels.get(z)
-                             .getBackground()
-                             .equals(Constants.GREY)) &&
-               !(buttonPanels.get(z)
-                             .getBackground()
-                             .equals(Constants.RED)))
-            {
-              buttonPanels.get(z).setBackground(Constants.DARK_BLUE);
-              buttonPanels.get(z).setEnabled(false);
-            }
-          }
-          invalidate();
-          validate();
-          repaint();
-          
-          for(int x = 0; x < shipListModel.getSize(); ++x){
-            @SuppressWarnings("unused")
-            String test = shipListModel.elementAt(x);
-            if(shipListModel.elementAt(x) == selected){
-              shipListModel.remove(x);
-              selected = "";
-              shipIndex = -1;
-            }
-          }
-        }
-        
-        else{
-          reset();
-          
-          if(!buttonPanels.get(buttonIndex)
-                          .getBackground()
-                          .equals(Constants.RED)){
-            buttonPanels.get(buttonIndex).setBackground(Constants.GREEN);
-            button.setForeground(Constants.WHITE);
-            invalidate();
-            validate();
-            repaint();
-          }
-          
-          int indexDivide = buttonIndex / 10;
-          int left = buttonIndex - size + 1;
-          int right = buttonIndex + size - 1;
-          int down = buttonIndex + ((size - 1) * 10);
-          int up = buttonIndex - ((size - 1) * 10);
-          
-          boolean setback = false;
-          if(left < 0){
-            setback = true;
-          }
-          
-          else if(!buttonPanels.get(left)
-                               .getBackground()
-                               .equals(Constants.RED)){
-            for(int y = 0; y < size; ++y){
-              if(buttonPanels.get(buttonIndex - y)
-                             .getBackground()
-                             .equals(Constants.RED)){
-                setback = true;
-              }
-            }
-            if(left / 10 != indexDivide){
-              setback = true;
-            }
-            if(!setback){
-              buttonPanels.get(left).setBackground(Constants.GREEN);
-              invalidate();
-              validate();
-              repaint();
-            }
-          }
-          
-          setback = false;
-          if(right / 10 > 9){
-            setback = true;
-          }
-          
-          else if(!buttonPanels.get(right)
-                               .getBackground()
-                               .equals(Constants.RED)){
-            for(int y = 0; y < size; ++y){
-              if(buttonPanels.get(buttonIndex + y)
-                             .getBackground()
-                             .equals(Constants.RED)){
-                setback = true;
-              }
-            }
-            if(right / 10 != indexDivide){
-              setback = true;
-            }
-            if(!setback){
-              buttonPanels.get(right).setBackground(Constants.GREEN);
-              invalidate();
-              validate();
-              repaint();
-            }
-          }
-          
-          setback = false;
-          if(down / 10 > 9){
-            setback = true;
-          }
-          else if(!buttonPanels.get(down)
-                               .getBackground()
-                               .equals(Constants.RED)){
-            for(int y = 0; y < size; ++y){
-              if(buttonPanels.get(buttonIndex + (y * 10))
-                             .getBackground()
-                             .equals(Constants.RED)){
-                setback = true;
-              }
-            }
-            if(!setback){
-              buttonPanels.get(down).setBackground(Constants.GREEN);
-              invalidate();
-              validate();
-              repaint();
-            }
-          }
-          
-          setback = false;
-          if(up < 0){
-            setback = true;
-          }
-          else if(!buttonPanels.get(up)
-                               .getBackground()
-                               .equals(Constants.RED)){
-            for(int y = 0; y < size; ++y){
-              if(buttonPanels.get(buttonIndex - (y * 10))
-                              .getBackground()
-                              .equals(Constants.RED)){
-                setback = true;
-              }
-            }
-            if(!setback){
-              buttonPanels.get(up).setBackground(Constants.GREEN);
-              invalidate();
-              validate();
-              repaint();
-            }
-          }
-        }
-      }
-      if(shipListModel.isEmpty()){
-        ready.setEnabled(true);
-      }
     }
   }
+    //oldaction
+      // public void actionPerformed(ActionEvent e){
+        
+      //   JButton buttoning = ((JButton) e.getSource());
+      //   String position = buttoning.getActionCommand();
+        
+      //   int i = position.charAt(0) - 'A' + 1;
+      //   int j = Integer.parseInt(position.substring(1));
+      //   buttonIndex = (10 * (i - 1)) + j;
+      //   int size = 0;
+      //   if(shipIndex > -1){
+      //     selected = shipListModel.elementAt(shipIndex);
+      //   }
+      //   else{
+      //     return;
+      //   }
+      //   if(selected == "Aircraft"){
+      //     size = Constants.AIRCRAFT_SIZE;
+      //   }
+      //   else if(selected == "Cruiser"){
+      //     size = Constants.CRUISER_SIZE;
+      //   }
+      //   else if(selected == "Battleship"){
+      //     size = Constants.BATTLESHIP_SIZE;
+      //   }
+      //   else if(selected == "Destroyer"){
+      //     size = Constants.DESTROYER_SIZE;
+      //   }
+      //   else if(selected == "Submarine"){
+      //     size = Constants.SUBMARINE_SIZE;
+      //   }
+      //   else{
+      //     return;
+      //   }
+        
+      //   if(button == buttoning){  
+      //     //button is green
+      //     if(buttonPanels.get(buttonIndex)
+      //                    .getBackground()
+      //                    .equals(Constants.GREEN))
+      //     {
+      //       if(buttonIndex + size - 1 < 100 &&
+      //          buttonPanels.get(buttonIndex + size - 1)
+      //                      .getBackground()
+      //                      .equals(Constants.GREEN))
+      //       {
+      //         setIndices(selected, buttonIndex, buttonIndex + size - 1);
+      //         for(int r = 0; r < size; ++r)
+      //         {
+      //           buttonPanels.get(buttonIndex + r).setBackground(Constants.RED);
+      //         }
+      //         invalidate();
+      //         validate();
+      //         repaint();
+      //       }
+            
+      //       else if(buttonIndex - size + 1 >= 0 &&
+      //               buttonPanels.get(buttonIndex - size + 1)
+      //                           .getBackground()
+      //                           .equals(Constants.GREEN))
+      //       {
+      //         setIndices(selected, buttonIndex, buttonIndex - size + 1);
+      //         for(int r = 0; r < size; ++r){
+      //           buttonPanels.get(buttonIndex - r).setBackground(Constants.RED);
+      //         }
+      //         invalidate();
+      //         validate();
+      //         repaint();
+      //       }
+            
+      //       else if(buttonIndex + (size - 1) * 10 < 100 &&
+      //               buttonPanels.get(buttonIndex + (size - 1) * 10)
+      //                           .getBackground()
+      //                           .equals(Constants.GREEN))
+      //       {
+      //         setIndices(selected, buttonIndex, buttonIndex + (size - 1) * 10);
+      //         for(int r = 0; r < size * 10; r += 10){
+      //           buttonPanels.get(buttonIndex + r).setBackground(Constants.RED);
+      //         }
+      //         invalidate();
+      //         validate();
+      //         repaint();
+      //       }
+            
+      //       else if(buttonIndex - (size - 1) * 10 >= 0 &&
+      //               buttonPanels.get(buttonIndex - (size - 1) * 10)
+      //                           .getBackground()
+      //                           .equals(Constants.GREEN))
+      //       {
+      //         setIndices(selected, buttonIndex, buttonIndex - (size - 1) * 10);
+      //         for(int r = 0; -size * 10 < r; r -= 10){
+      //           buttonPanels.get(buttonIndex + r).setBackground(Constants.RED);
+      //         }
+      //         invalidate();
+      //         validate();
+      //         repaint();
+      //       }
+            
+      //       for(int z = 0; z < 100; ++z){
+      //         if(!(buttonPanels.get(z)
+      //                          .getBackground()
+      //                          .equals(Constants.GREY)) &&
+      //            !(buttonPanels.get(z)
+      //                          .getBackground()
+      //                          .equals(Constants.RED)))
+      //         {
+      //           buttonPanels.get(z).setBackground(Constants.DARK_BLUE);
+      //           buttonPanels.get(z).setEnabled(false);
+      //         }
+      //       }
+      //       invalidate();
+      //       validate();
+      //       repaint();
+            
+      //       for(int x = 0; x < shipListModel.getSize(); ++x){
+      //         @SuppressWarnings("unused")
+      //         String test = shipListModel.elementAt(x);
+      //         if(shipListModel.elementAt(x) == selected){
+      //           shipListModel.remove(x);
+      //           selected = "";
+      //           shipIndex = -1;
+      //         }
+      //       }
+      //     }
+      //     //button not green
+      //     else{
+      //       reset();
+      //       //button is not red
+      //       if(!buttonPanels.get(buttonIndex)
+      //                       .getBackground()
+      //                       .equals(Constants.RED))
+      //       {
+      //         buttonPanels.get(buttonIndex).setBackground(Constants.GREEN);
+      //         button.setForeground(Constants.WHITE);
+      //         invalidate();
+      //         validate();
+      //         repaint();
+      //       }
+            
+      //       int indexDivide = buttonIndex / 10;
+      //       int left = buttonIndex - size + 1;
+      //       int right = buttonIndex + size - 1;
+      //       int down = buttonIndex + ((size - 1) * 10);
+      //       int up = buttonIndex - ((size - 1) * 10);
+            
+      //       boolean setback = false;
+      //       if(left < 0){
+      //         setback = true;
+      //       }
+            
+      //       else if(!buttonPanels.get(left)
+      //                            .getBackground()
+      //                            .equals(Constants.RED)){
+      //         for(int y = 0; y < size; ++y){
+      //           if(buttonPanels.get(buttonIndex - y)
+      //                          .getBackground()
+      //                          .equals(Constants.RED)){
+      //             setback = true;
+      //           }
+      //         }
+      //         if(left / 10 != indexDivide){
+      //           setback = true;
+      //         }
+      //         if(!setback){
+      //           buttonPanels.get(left).setBackground(Constants.GREEN);
+      //           invalidate();
+      //           validate();
+      //           repaint();
+      //         }
+      //       }
+            
+      //       setback = false;
+      //       if(right / 10 > 9){
+      //         setback = true;
+      //       }
+            
+      //       else if(!buttonPanels.get(right)
+      //                            .getBackground()
+      //                            .equals(Constants.RED)){
+      //         for(int y = 0; y < size; ++y){
+      //           if(buttonPanels.get(buttonIndex + y)
+      //                          .getBackground()
+      //                          .equals(Constants.RED)){
+      //             setback = true;
+      //           }
+      //         }
+      //         if(right / 10 != indexDivide){
+      //           setback = true;
+      //         }
+      //         if(!setback){
+      //           buttonPanels.get(right).setBackground(Constants.GREEN);
+      //           invalidate();
+      //           validate();
+      //           repaint();
+      //         }
+      //       }
+            
+      //       setback = false;
+      //       if(down / 10 > 9){
+      //         setback = true;
+      //       }
+      //       else if(!buttonPanels.get(down)
+      //                            .getBackground()
+      //                            .equals(Constants.RED)){
+      //         for(int y = 0; y < size; ++y){
+      //           if(buttonPanels.get(buttonIndex + (y * 10))
+      //                          .getBackground()
+      //                          .equals(Constants.RED)){
+      //             setback = true;
+      //           }
+      //         }
+      //         if(!setback){
+      //           buttonPanels.get(down).setBackground(Constants.GREEN);
+      //           invalidate();
+      //           validate();
+      //           repaint();
+      //         }
+      //       }
+            
+      //       setback = false;
+      //       if(up < 0){
+      //         setback = true;
+      //       }
+      //       else if(!buttonPanels.get(up)
+      //                            .getBackground()
+      //                            .equals(Constants.RED)){
+      //         for(int y = 0; y < size; ++y){
+      //           if(buttonPanels.get(buttonIndex - (y * 10))
+      //                           .getBackground()
+      //                           .equals(Constants.RED)){
+      //             setback = true;
+      //           }
+      //         }
+      //         if(!setback){
+      //           buttonPanels.get(up).setBackground(Constants.GREEN);
+      //           invalidate();
+      //           validate();
+      //           repaint();
+      //         }
+      //       }
+      //     }
+      //   }
+      //   if(shipListModel.isEmpty()){
+      //     ready.setEnabled(true);
+      //   }
+      //     }
+      // }
   
   public void getReadyPlayers(){
     for(int i = 0; i < 4; ++i){

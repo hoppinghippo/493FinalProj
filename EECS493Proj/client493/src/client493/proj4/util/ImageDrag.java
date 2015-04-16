@@ -31,6 +31,7 @@ public class ImageDrag extends JComponent implements MouseMotionListener, MouseL
 	int x=300, y=300, width, height, size;
 	int xVal = -5, yVal = -5;
 	
+	Board board;
 	Piece piece;
 	Color color;
 	JButton submitButton;
@@ -89,13 +90,13 @@ public class ImageDrag extends JComponent implements MouseMotionListener, MouseL
 		}
 		lightImage = lightImage.getScaledInstance(width, height, Image.SCALE_SMOOTH);
 		darkImage = darkImage.getScaledInstance(width, height, Image.SCALE_SMOOTH);
-		if(player != null){
-			translatePieceHelper();
-		}
+			
+		translatePieceHelper();
 	}
   
-	public ImageDrag(Piece piece, int size, JButton submit){
+	public ImageDrag(Piece piece, int size, JButton submit, Board board){
 		this.piece = piece;
+		this.board = board;
 		this.submitButton = submit;
 		initComponents(size);
 		addMouseMotionListener(this);
@@ -109,41 +110,42 @@ public class ImageDrag extends JComponent implements MouseMotionListener, MouseL
 		this.size = size;
 		this.clicked = false;
 		ImageIcon temp;
+		String path = "/client493/images/SetUp/";
 		try { 
 			switch(piece.getColor()){
-				case 'b':
+				case 'n':
 					temp = new ImageIcon(getClass().getResource(
-							"/images/Blue/" + piece.getType() + ".png"));
+							path + "Norm" + piece.getType() + ".png"));
 					darkImage = temp.getImage();
-					temp = new ImageIcon(getClass().getResource(
-							"/images/Blue/" + piece.getType() + "T.png"));
+					// temp = new ImageIcon(getClass().getResource(
+					// 		"/images/Blue/" + piece.getType() + "T.png"));
 					lightImage = temp.getImage();
-					color = Color.BLUE;
+					color = Color.GRAY;
 					break;
 				case 'r':
 					temp = new ImageIcon(getClass().getResource(
-							"/images/Red/" + piece.getType() + ".png"));
+							path + "Red" + piece.getType() + ".png"));
 					darkImage = temp.getImage();
-					temp = new ImageIcon(getClass().getResource(
-							"/images/Red/" + piece.getType() + "T.png"));
+					// temp = new ImageIcon(getClass().getResource(
+					// 		"/images/Red/" + piece.getType() + "T.png"));
 					lightImage = temp.getImage();
 					color = Color.RED;
 					break;
 				case 'y':
 					temp = new ImageIcon(getClass().getResource(
-							"/images/Yellow/" + piece.getType() + ".png"));
+							path + "Yellow" + piece.getType() + ".png"));
 					darkImage = temp.getImage();
-					temp = new ImageIcon(getClass().getResource(
-							"/images/Yellow/" + piece.getType() + "T.png"));
+					// temp = new ImageIcon(getClass().getResource(
+					// 		"/images/Yellow/" + piece.getType() + "T.png"));
 					lightImage = temp.getImage();
 					color = Color.YELLOW;
 					break;
 				case 'g':
 					temp = new ImageIcon(getClass().getResource(
-							"/images/Green/" + piece.getType() + ".png"));
+							path + "Green" + piece.getType() + ".png"));
 					darkImage = temp.getImage();
-					temp = new ImageIcon(getClass().getResource(
-							"/images/Green/" + piece.getType() + "T.png"));
+					// temp = new ImageIcon(getClass().getResource(
+					// 		"/images/Green/" + piece.getType() + "T.png"));
 					lightImage = temp.getImage();
 					color = Color.GREEN;
 					break;
@@ -185,12 +187,7 @@ public class ImageDrag extends JComponent implements MouseMotionListener, MouseL
 				System.out.println("Location: " + xVal + "," + yVal + 
 						"   State: " + piece.getState());
 				piece.printShape();
-				boolean validSpot = false;
-				if(player.isInit()){
-					validSpot = board.validInit(xVal, yVal, piece);
-				}
-				else
-					validSpot = board.validPlace(xVal, yVal, piece, false);
+				boolean validSpot = board.validPlace(xVal, yVal, piece);
 				if(validSpot){
 					image = darkImage;
 					if(submitButton != null)
@@ -236,20 +233,13 @@ public class ImageDrag extends JComponent implements MouseMotionListener, MouseL
 		removeMouseMotionListener(this);
 	}
 	
-	
-	
 	//Only called When it is the current players move! NOT UPDATE
 	public void translatePieceHelper(){
 		System.out.println("Location: " + xVal + "," + yVal + "   State: " + piece.getState());
 		piece.printShape();
 		image = lightImage;
 		submitButton.setEnabled(false);
-		boolean validSpot = false;
-		if(player.isInit()){
-			validSpot = board.validInit(xVal, yVal, piece);
-		}
-		else
-			validSpot = board.validPlace(xVal, yVal, piece, false);
+		boolean validSpot = board.validPlace(xVal, yVal, piece);
 		if(validSpot){
 			image = darkImage;
 			if(submitButton != null)
@@ -281,9 +271,6 @@ public class ImageDrag extends JComponent implements MouseMotionListener, MouseL
 		flip();
 		setToState(piece.getState());
 	}
-	
-	
-	
 	
 	//Internal Functions to make ONLY THE PIECE CHANGE
 	public void rotateClockwise(){
