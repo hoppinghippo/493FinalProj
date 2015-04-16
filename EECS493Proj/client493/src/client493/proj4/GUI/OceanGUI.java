@@ -21,12 +21,14 @@ public class OceanGUI extends JFrame{
   private JDialog winner;
   
   private static Player player;
-  private static JButton fire = new JButton("         FIRE");
+  private static JButton fire = new JButton();
   
   private static ButtonGrid p1Map = new ButtonGrid();
   private static ButtonGrid p2Map = new ButtonGrid();
   private static ButtonGrid p3Map = new ButtonGrid();
   private static ButtonGrid p4Map = new ButtonGrid();
+  
+  public JPanel buttons = new JPanel();
   
   private static JLabel p1Name = new JLabel("Player One");
   private static JLabel p2Name = new JLabel("Player Two");
@@ -42,6 +44,8 @@ public class OceanGUI extends JFrame{
   private int shipsRemaining2;
   private int shipsRemaining3;
   private int shipsRemaining4;
+  
+  public JTextArea textArea;
   
   private static JButton shield;
   private static JButton DoubleShots;
@@ -70,14 +74,17 @@ public class OceanGUI extends JFrame{
     shipsRemaining3 = 5;
     shipsRemaining4 = 5;
     
-    JPanel oceans = new JPanel(new GridLayout(2,2));
+    
+  
+    
+    JPanel oceans = new JPanel(new GridLayout(1,3));
     
     JPanel p1Container = new JPanel();
     JPanel p2Container = new JPanel();
     JPanel p3Container = new JPanel();
     JPanel p4Container = new JPanel();
     JPanel gifContainer = new JPanel();
-    JPanel buttons = new JPanel();
+  
     JPanel right = new JPanel();
     
     JPanel p1ShipsPanel = new JPanel();
@@ -99,10 +106,10 @@ public class OceanGUI extends JFrame{
     p3Container.setOpaque(false);
     p4Container.setOpaque(false);
     
-    p1Container.setBorder(BorderFactory.createEmptyBorder(15, 15, 0, 10));
-    p2Container.setBorder(BorderFactory.createEmptyBorder(15, 0, 0, 10));
-    p3Container.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 10));
-    p4Container.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 10));
+//    p1Container.setBorder(BorderFactory.createEmptyBorder(15, 15, 0, 10));
+    p2Container.setBorder(BorderFactory.createEmptyBorder(10, 10, 0, 10));
+    p3Container.setBorder(BorderFactory.createEmptyBorder(10, 10, 0, 10));
+    p4Container.setBorder(BorderFactory.createEmptyBorder(10, 10, 0, 10));
     
     p1Name.setText(player.getName());
     p2Name.setText(p2);
@@ -110,7 +117,7 @@ public class OceanGUI extends JFrame{
     p4Name.setText(p4);
     
     p1Name.setFont(new Font("Overlock-Regular", Font.PLAIN, 14));
-    p1Name.setForeground(Color.WHITE);
+    p1Name.setForeground(Color.RED);
     p2Name.setFont(new Font("Overlock-Regular", Font.PLAIN, 14));
     p2Name.setForeground(Color.WHITE);
     p3Name.setFont(new Font("Overlock-Regular", Font.PLAIN, 14));
@@ -119,7 +126,7 @@ public class OceanGUI extends JFrame{
     p4Name.setForeground(Color.WHITE);
     
     p1Ships.setFont(new Font("Overlock-Regular", Font.PLAIN, 14));
-    p1Ships.setForeground(Color.WHITE);
+    p1Ships.setForeground(Color.RED);
     p2Ships.setFont(new Font("Overlock-Regular", Font.PLAIN, 14));
     p2Ships.setForeground(Color.WHITE);
     p3Ships.setFont(new Font("Overlock-Regular", Font.PLAIN, 14));
@@ -127,9 +134,10 @@ public class OceanGUI extends JFrame{
     p4Ships.setFont(new Font("Overlock-Regular", Font.PLAIN, 14));
     p4Ships.setForeground(Color.WHITE);
     
-    Dimension mapSize = new Dimension(280,280);
-    p1Map.setMinimumSize(mapSize);
-    p1Map.setMaximumSize(mapSize);
+    Dimension mapSize = new Dimension(320,320);
+    Dimension playerMapSize = new Dimension(320,320);
+    p1Map.setMinimumSize(playerMapSize);
+    p1Map.setMaximumSize(playerMapSize);
     p1Map.setPreferredSize(mapSize);
     p2Map.setMinimumSize(mapSize);
     p2Map.setMaximumSize(mapSize);
@@ -147,6 +155,7 @@ public class OceanGUI extends JFrame{
     p1ShipsPanel.add(p1Name);
     p1ShipsPanel.add(Box.createHorizontalGlue());
     p1ShipsPanel.add(p1Ships);
+    p1ShipsPanel.setSize(100, 100);
     
     p2Container.add(p2Map);
     p2Container.add(p2ShipsPanel);
@@ -174,7 +183,7 @@ public class OceanGUI extends JFrame{
     p3ShipsPanel.setOpaque(false);
     p4ShipsPanel.setOpaque(false);
     
-    Dimension labelSize = new Dimension(280,15);
+    Dimension labelSize = new Dimension(300,15);
     p1ShipsPanel.setMinimumSize(labelSize);
     p1ShipsPanel.setMaximumSize(labelSize);
     p1ShipsPanel.setPreferredSize(labelSize);
@@ -188,49 +197,53 @@ public class OceanGUI extends JFrame{
     p4ShipsPanel.setMaximumSize(labelSize);
     p4ShipsPanel.setPreferredSize(labelSize);
     
-    oceans.add(p1Container);
+   // oceans.add(p1Container);
     oceans.add(p2Container);
     oceans.add(p3Container);
     oceans.add(p4Container);
     oceans.setOpaque(false);
-    oceans.setBorder(BorderFactory.createEmptyBorder(0, 50, 0, -10));
+   // oceans.setBorder(BorderFactory.createEmptyBorder(0, 50, 0, 10));
     
     gifContainer.setLayout(new BoxLayout(gifContainer, BoxLayout.Y_AXIS));
     gifContainer.setOpaque(false);
     gifContainer.add(radar);
-    gifContainer.setBorder(BorderFactory.createEmptyBorder(95, 0, -5, 39));
+    //gifContainer.setBorder(BorderFactory.createEmptyBorder(95, 0, -5, 39));
     
     fire.setFont(new Font("Impact", Font.BOLD, 70));
     fire.setForeground(Color.WHITE);
-    fire.setOpaque(false);
-    fire.setContentAreaFilled(false);
+    fire.setBackground(Color.RED);
+   
+   // fire.setContentAreaFilled(false);
     fire.setBorderPainted(false);
-    fire.addActionListener(new FireListener());
-    fire.setAlignmentY(LEFT_ALIGNMENT);
+    FireListener thelistener = new FireListener();
+    fire.addActionListener(thelistener);
+   //.setAlignmentY(LEFT_ALIGNMENT);
     fire.setCursor(new Cursor(Cursor.HAND_CURSOR));
-    buttons.add(new Box(BoxLayout.X_AXIS));
-    buttons.add(fire);
-    buttons.setAlignmentY(RIGHT_ALIGNMENT);
-    buttons.setOpaque(false);
-    
-    JPanel rightWrapper = new JPanel();
-    right.setLayout(new BoxLayout(right, BoxLayout.Y_AXIS));
-    right.add(gifContainer);
-    right.add(Box.createRigidArea(new Dimension(100,156)));
-    right.add(buttons);
-    right.setBorder(BorderFactory.createEmptyBorder(20, -70, 0, 0));
+   // buttons.add(new Box(BoxLayout.X_AXIS));
+   // buttons.add(fire);
+   // buttons.setAlignmentY(RIGHT_ALIGNMENT);
+//   buttons.setOpaque(false);
+    fire.setText("FIRE");
+ 
+
+   // right.add(gifContainer);
+  //  right.add(Box.createRigidArea(new Dimension(100,300)));
+    right.setLayout(new GridLayout(2, 1, 15, 15));
+   
+   // right.setBorder(BorderFactory.createEmptyBorder(20, -70, 0, 0));
     right.setOpaque(false);
-    rightWrapper.add(right);
-    rightWrapper.setOpaque(false);
+   
     
     
-    Box finalb = new Box(BoxLayout.X_AXIS);
-    Box backgroundFrame = new Box(BoxLayout.X_AXIS);
+    JPanel finalb = new JPanel();
+    finalb.setLayout(new GridLayout(1, 3, 20, 20));
+    
+    Box backgroundFrame = new Box(BoxLayout.Y_AXIS);
     
     
     
-    JLabel powerups = new JLabel("Power Ups: ");
-    powerups.setForeground(Constants.YELLOW);
+    JLabel powerups = new JLabel("             Power Ups");
+    powerups.setForeground(Constants.WHITE);
     powerups.setFont(new Font("Overlock-Regular", Font.BOLD, 22));
     shield = new JButton("SHIELD");
     DoubleShots = new JButton("DOUBLE AMMO");
@@ -254,31 +267,65 @@ public class OceanGUI extends JFrame{
     DoubleShots.addActionListener(new DoubleAmo());
     shield.addActionListener(new Shielding());
     JPanel bot = new JPanel();
-    bot.setLayout(new FlowLayout(FlowLayout.LEFT));
+    bot.setLayout(new GridLayout(4,1));
     bot.setSize(100, 10);
-    bot.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 250));
+    bot.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
     bot.add(powerups);
     bot.add(shield);
     bot.add(DoubleShots);
     bot.add(hidemisses);
+  
+ 
+
+    
+    
     bot.setOpaque(false);
     backgroundFrame.add(oceans);
-    backgroundFrame.add(rightWrapper);
+  //  backgroundFrame.add(rightWrapper);
     backgroundFrame.setOpaque(false);
-    finalb.add(bot);
+    
+    
+    Dimension textSize = new Dimension(10,10);
+    textArea = new JTextArea(20, 20);
+
+    textArea.setEditable(false);
+    textArea.setBackground(Constants.BLACK);
+    textArea.setForeground(Constants.RED);
+  //  textArea.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+    textArea.append("Initiating game...");
+    textArea.setMaximumSize(textSize);
+    textArea.setMinimumSize(textSize);
+    textArea.setSize(textSize);
+    JPanel textHolder = new JPanel();
+    textHolder.setSize(30, 30);
+    textHolder.add(textArea);
+    textHolder.setBackground(Color.DARK_GRAY);
+   // textWrapper.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+    finalb.add(textHolder);
+    finalb.add(p1Container);
+    right.add(bot);
+    right.add(fire);
+    finalb.add(right);
     finalb.setOpaque(false);
     
+
+
     
-    String imagePath = "client493/images/metaltexture.jpg";
+    String imagePath = "client493/images/metal.jpg";
     JLabel background = new JLabel(new ImageIcon(getClass()
                                                  .getClassLoader()
-                                                 .getResource(imagePath)));
+         .getResource(imagePath)));
+    
+ //   JLabel background = new JLabel();
+    backgroundFrame.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
     background.setLayout(new FlowLayout());
     background.add(backgroundFrame);
     background.add(finalb);
     //setContentPane(background);
     JScrollPane hold = new JScrollPane(background);
+    hold.setSize(1600, 1600);
     add(hold);
+   
     
   //  background.setLayout(new FlowLayout());
     
@@ -294,6 +341,10 @@ public class OceanGUI extends JFrame{
         p1Map.setPanelColor(i, Constants.DARKER_BLUE, Constants.WHITE);
       }
     }
+    
+    
+    
+    
   }
   
   public boolean findWinner()
@@ -573,6 +624,10 @@ public class OceanGUI extends JFrame{
            JOptionPane.showMessageDialog(null, "Too many shots. Please select a maximum of " + Constants.MAX_SHOTS * 2 + " coordinates to send.", "Too many shots.", JOptionPane.ERROR_MESSAGE);
         }
         else if(count <= Constants.MAX_SHOTS || (doubleshot && count <= 10)){
+          fire.setEnabled(true);
+          fire.setVisible(false);
+          fire.setText("...");
+          textArea.append("\n Waiting for other players to fire...\n");
           sendPower(); 
           sendShots(count);
           receiveShots();
@@ -581,6 +636,9 @@ public class OceanGUI extends JFrame{
           recievePower();
           findWinner();
           checkifdead();
+          fire.setVisible(true);
+          fire.setText("FIRE");
+          fire.setEnabled(false);
         }
       }
     }
@@ -743,23 +801,21 @@ public class OceanGUI extends JFrame{
 	    		
 	    		if(hide2){
 	    			clearWhites(playerNumber);
-	    			JOptionPane.showMessageDialog(null, tempName + " hid all of their misses!\n",
-							"POWERUP",
-							JOptionPane.INFORMATION_MESSAGE);
+	    			String theString = tempName + " hid all of their misses!\n"; 
+	    			textArea.append(theString);
+	    			
 	    		}
 	    		if(shield){
-	    			JOptionPane.showMessageDialog(null, tempName + " used their SHEILD powerup!\n" + 
+	    		  String theString =  tempName + " used their SHEILD powerup!\n" + 
 	    												"All attacks to player " + tempName + 
-	    												" missed.",
-	    												"POWERUP",
-	    												JOptionPane.INFORMATION_MESSAGE);
+	    												" missed\n."; 
+	    		  textArea.append(theString);
 	    		}
 	    		if(shot){
-	    			JOptionPane.showMessageDialog(null, tempName + " used their DOUBLE AMMO powerup!\n" + 
+	    		  String theString = tempName + " used their DOUBLE AMMO powerup!\n" + 
 							"player " + tempName + 
-							" can use up to 10 shots",
-							"POWERUP",
-							JOptionPane.INFORMATION_MESSAGE);
+							" can use up to 10 shots\n";
+	    		  textArea.append(theString);
 	    		}
 	    	
 	    	}catch(IOException e){

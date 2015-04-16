@@ -178,8 +178,8 @@ public class PlayerSocket{
   }
   public void sendNoPower(){
 	  try{	 
-		  boolean nottrue = false; 
-		  outData.writeBoolean(nottrue);
+
+		  outData.writeBoolean(false);
 	  }catch(IOException e){}
   }
 }

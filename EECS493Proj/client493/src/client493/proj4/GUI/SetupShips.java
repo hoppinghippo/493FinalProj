@@ -779,7 +779,8 @@ public class SetupShips extends JFrame {
     ocean.pack();
     ocean.setVisible(true);
     ocean.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-    dispose();
+    
+    setVisible(false);
   }
   
 }

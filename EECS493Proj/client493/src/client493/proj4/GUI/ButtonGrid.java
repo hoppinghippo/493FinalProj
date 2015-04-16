@@ -22,19 +22,20 @@ public class ButtonGrid extends JPanel{
     for(int i = 0; i < N; ++i){
       for(int j = 0; j < N; ++j){
         ButtonPanel bp = new ButtonPanel(letter, j);
+      
         panels.add(bp);
         this.add(bp);
       }
       ++letter;
     }
   }
-
+  
   class ButtonPanel extends JPanel implements ActionListener{
     
     JButton button;
 
     public ButtonPanel(char letter, int i){
-      setBorder(BorderFactory.createLineBorder(new Color(25, 130, 170)));
+      setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY));
       setBackground(new Color(5, 50, 75));
       button = new JButton(letter + String.valueOf(i));
       button.setForeground(Color.white);
@@ -46,7 +47,7 @@ public class ButtonGrid extends JPanel{
     }
         
     public void actionPerformed(ActionEvent event){
-      JButton button = ((JButton) event.getSource());
+      button = ((JButton) event.getSource());
       String position = button.getActionCommand();
       int i = position.charAt(0) - 'A' + 1;
       int j = Integer.parseInt(position.substring(1));
