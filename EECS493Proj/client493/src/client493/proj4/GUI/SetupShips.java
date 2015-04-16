@@ -16,7 +16,7 @@ public class SetupShips extends JFrame {
   private DefaultListModel<String> shipListModel;
   private JList<String> shipList;
   private JScrollPane shipScrollPane;
-  private JTextArea shipTextArea;
+  // private JTextArea shipTextArea;
   private int shipIndex;
   private String selected;
   
@@ -30,6 +30,10 @@ public class SetupShips extends JFrame {
   private JButton clear;
   private JButton ready;
   private JButton random;
+
+  //ship control
+  private JButton rotate;
+  private JButton set;
   
   private JLabel search = new JLabel("", SwingConstants.LEFT);
   
@@ -42,6 +46,7 @@ public class SetupShips extends JFrame {
     selected = "";
     player = inPlayer;
     
+    //create ship list
     shipListModel = addShips();
     shipList = new JList<String>(shipListModel);
     
@@ -68,10 +73,10 @@ public class SetupShips extends JFrame {
     shipScrollPane.setMinimumSize(new Dimension(183, 279));
     shipScrollPane.setMaximumSize(new Dimension(183, 279));
     shipScrollPane.setPreferredSize(new Dimension(183, 279));
-    shipTextArea = new JTextArea(183, 279);
-    Font overlock = new Font("Overlock-Regular", Font.PLAIN, 13);
-    shipTextArea.setFont(overlock);
-    shipTextArea.add(shipScrollPane);
+    // shipTextArea = new JTextArea(183, 279);
+    // Font overlock = new Font("Overlock-Regular", Font.PLAIN, 13);
+    // shipTextArea.setFont(overlock);
+    // shipTextArea.add(shipScrollPane);
     
     clear = new JButton("Clear");
     clear.setFont(new Font("Sans Serif", Font.PLAIN, 13));
@@ -236,6 +241,7 @@ public class SetupShips extends JFrame {
     }
   }
   
+  //for random
   public void placeShip(int ship, boolean[] ocean, int start, int end)
   {
     if(ship == 0)
@@ -537,15 +543,19 @@ public class SetupShips extends JFrame {
       }
       
       if(button == buttoning){  
+        //button is valid ship end spot
         if(buttonPanels.get(buttonIndex)
                        .getBackground()
-                       .equals(Constants.GREEN)){
+                       .equals(Constants.GREEN))
+        {
           if(buttonIndex + size - 1 < 100 &&
              buttonPanels.get(buttonIndex + size - 1)
                          .getBackground()
-                         .equals(Constants.GREEN)){
+                         .equals(Constants.GREEN))
+          {
             setIndices(selected, buttonIndex, buttonIndex + size - 1);
-            for(int r = 0; r < size; ++r){
+            for(int r = 0; r < size; ++r)
+            {
               buttonPanels.get(buttonIndex + r).setBackground(Constants.RED);
             }
             invalidate();
@@ -556,7 +566,8 @@ public class SetupShips extends JFrame {
           else if(buttonIndex - size + 1 >= 0 &&
                   buttonPanels.get(buttonIndex - size + 1)
                               .getBackground()
-                              .equals(Constants.GREEN)){
+                              .equals(Constants.GREEN))
+          {
             setIndices(selected, buttonIndex, buttonIndex - size + 1);
             for(int r = 0; r < size; ++r){
               buttonPanels.get(buttonIndex - r).setBackground(Constants.RED);
@@ -569,7 +580,8 @@ public class SetupShips extends JFrame {
           else if(buttonIndex + (size - 1) * 10 < 100 &&
                   buttonPanels.get(buttonIndex + (size - 1) * 10)
                               .getBackground()
-                              .equals(Constants.GREEN)){
+                              .equals(Constants.GREEN))
+          {
             setIndices(selected, buttonIndex, buttonIndex + (size - 1) * 10);
             for(int r = 0; r < size * 10; r += 10){
               buttonPanels.get(buttonIndex + r).setBackground(Constants.RED);
@@ -582,7 +594,8 @@ public class SetupShips extends JFrame {
           else if(buttonIndex - (size - 1) * 10 >= 0 &&
                   buttonPanels.get(buttonIndex - (size - 1) * 10)
                               .getBackground()
-                              .equals(Constants.GREEN)){
+                              .equals(Constants.GREEN))
+          {
             setIndices(selected, buttonIndex, buttonIndex - (size - 1) * 10);
             for(int r = 0; -size * 10 < r; r -= 10){
               buttonPanels.get(buttonIndex + r).setBackground(Constants.RED);
@@ -598,7 +611,8 @@ public class SetupShips extends JFrame {
                              .equals(Constants.GREY)) &&
                !(buttonPanels.get(z)
                              .getBackground()
-                             .equals(Constants.RED))){
+                             .equals(Constants.RED)))
+            {
               buttonPanels.get(z).setBackground(Constants.DARK_BLUE);
               buttonPanels.get(z).setEnabled(false);
             }
