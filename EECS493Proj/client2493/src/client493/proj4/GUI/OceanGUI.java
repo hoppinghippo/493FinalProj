@@ -352,6 +352,15 @@ public class OceanGUI extends JFrame{
 	{
 		if (shipsRemaining1 == 0 && shipsRemaining2 == 0 && shipsRemaining3 == 0 && shipsRemaining4 == 0)
 		{
+			JOptionPane.showMessageDialog(null, "This game has ended in a tie!");
+		} 
+		else if (shipsRemaining2 == 0 && shipsRemaining3 == 0 && shipsRemaining4 == 0) // Winner is p1
+		{
+			JOptionPane.showMessageDialog(null, "You have won the game!");
+		}
+
+		if (shipsRemaining1 == 0 && shipsRemaining2 == 0 && shipsRemaining3 == 0 && shipsRemaining4 == 0)
+		{
 			winner = new WinningDialog(true, "tie");
 			dispose();
 			return false; 
