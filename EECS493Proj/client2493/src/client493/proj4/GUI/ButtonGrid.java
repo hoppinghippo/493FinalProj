@@ -58,10 +58,10 @@ public class ButtonGrid extends JPanel{
         bp.setBackground(Constants.YELLOW);
         button.setForeground(Constants.BLACK);
       }
-      else if(background == Constants.GREY ||
-              background == Constants.WHITE ||
-              background == Constants.RED ||
-              background == Constants.DARKER_BLUE){
+      else if(background.equals(Constants.GREY) ||
+              background.equals(Constants.WHITE) ||
+              background.equals(Constants.RED) ||
+              background.equals(Constants.DARKER_BLUE)){
       }
       else{
         bp.setBackground(Constants.DARK_BLUE);

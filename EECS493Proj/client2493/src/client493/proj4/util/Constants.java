@@ -16,6 +16,7 @@ public class Constants{
   public final static Color LIGHT_BLUE = new Color(25, 130, 170);
   public final static Color DARK_BLUE = new Color(5, 50, 75);
   public final static Color DARKER_BLUE = new Color(5, 50, 76);
+  public final static Color LIME_GREEN = new Color(50, 205, 50);
   public final static Color BLACK = Color.black;
   public final static Color WHITE = Color.white;
   public final static Color GREY = Color.gray;

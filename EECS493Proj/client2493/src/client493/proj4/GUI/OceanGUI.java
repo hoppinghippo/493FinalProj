@@ -18,10 +18,11 @@ import javax.swing.*;
 @SuppressWarnings("serial")
 public class OceanGUI extends JFrame{
 	
-  private JDialog winner;
+  public JDialog winner;
   
   private static Player player;
   private static JButton fire = new JButton();
+  public static int currentRound = 0;
   
   private static ButtonGrid p1Map = new ButtonGrid();
   private static ButtonGrid p2Map = new ButtonGrid();
@@ -290,7 +291,7 @@ public class OceanGUI extends JFrame{
 
     textArea.setEditable(false);
     textArea.setBackground(Constants.BLACK);
-    textArea.setForeground(new Color(50, 205, 50));
+    textArea.setForeground(Constants.LIME_GREEN);
   //  textArea.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
     textArea.append("Initiating game...");
     textArea.setMaximumSize(textSize);
@@ -531,9 +532,6 @@ public class OceanGUI extends JFrame{
       if(playerNumber == 1){
         p1Ships.setText("Ships Remaining: " + shipsRemaining);
         shipsRemaining1 = shipsRemaining;
-        if(shipsRemaining1 == 0){
-        	JOptionPane.showMessageDialog(null, "You have died, please wait until someone has won", "You have died", JOptionPane.INFORMATION_MESSAGE);
-        }
       }
       else if(playerNumber == 2){
         p2Ships.setText("Ships Remaining: " + shipsRemaining);
@@ -627,9 +625,11 @@ public class OceanGUI extends JFrame{
            JOptionPane.showMessageDialog(null, "Too many shots. Please select a maximum of " + Constants.MAX_SHOTS * 2 + " coordinates to send.", "Too many shots.", JOptionPane.ERROR_MESSAGE);
         }
         else if(count <= Constants.MAX_SHOTS || (doubleshot && count <= 10)){
-          fire.setEnabled(true);
+          fire.setEnabled(false);
           fire.setVisible(false);
           fire.setText("...");
+          textArea.append("Shots fired for Round: " + currentRound);
+          currentRound++;
           textArea.append("\n Waiting for other players to fire...\n");
           sendPower(); 
           sendShots(count);
@@ -641,7 +641,7 @@ public class OceanGUI extends JFrame{
           checkifdead();
           fire.setVisible(true);
           fire.setText("FIRE");
-          fire.setEnabled(false);
+          fire.setEnabled(true);
         }
       }
     }
@@ -655,7 +655,6 @@ public class OceanGUI extends JFrame{
     	  Color c = p1Map.getButtonPanels().get(i).getBackground();
     	  p1Map.setPanelColor(i, c, Constants.YELLOW);
       }
-      shipsRemaining1 = 0;
     }
     else if(playerNumber == 2){
       p2Ships.setText("No Ships Remaining");
@@ -669,7 +668,6 @@ public class OceanGUI extends JFrame{
             p2Map.setPanelColor(i, Constants.DARKER_BLUE, Constants.YELLOW);
           }
       }
-      shipsRemaining2 = 0;
       
     }
     else if(playerNumber == 3){
@@ -684,7 +682,6 @@ public class OceanGUI extends JFrame{
             p3Map.setPanelColor(i, Constants.DARKER_BLUE, Constants.YELLOW);
           }
       }
-      shipsRemaining3 = 0;
     }
     else if(playerNumber == 4){
       p4Ships.setText("No Ships Remaining");
@@ -698,7 +695,6 @@ public class OceanGUI extends JFrame{
             p4Map.setPanelColor(i, Constants.DARKER_BLUE, Constants.YELLOW);
           }
       }
-      shipsRemaining4 = 0;
       
     }
   }
