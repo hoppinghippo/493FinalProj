@@ -643,6 +643,7 @@ public class OceanGUI extends JFrame{
 					fire.setVisible(true);
 					fire.setText("FIRE");
 					fire.setEnabled(true);
+					textArea.append("\n All Players fired!...\n");
 				}
 			}
 		}
