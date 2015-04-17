@@ -14,12 +14,23 @@ import java.io.IOException;
 import java.util.List;
 
 import javax.swing.*;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.InputMap;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JRootPane;
+import javax.swing.KeyStroke;
 
 @SuppressWarnings("serial")
 public class OceanGUI extends JFrame{
 
 	public JDialog winner;
-
+	public boolean hasBeenEliminated = false;
 	private static Player player;
 	private static JButton fire = new JButton();
 	public static int currentRound = 0;
@@ -558,7 +569,21 @@ public class OceanGUI extends JFrame{
 			{
 				if (playerNumber == 1)
 				{
-					JOptionPane.showMessageDialog(null, "You have been eliminated from the game.");
+					if (hasBeenEliminated == false) {
+				        final JDialog dialog = new JDialog(new JFrame(), "You have been eliminated");
+				        Timer timer = new Timer(2000, new ActionListener() {
+				            public void actionPerformed(ActionEvent e) {
+				                dialog.setVisible(false);
+				                dialog.dispose();
+				            }
+				        });
+				        timer.setRepeats(false);
+				        timer.start();
+				        dialog.setVisible(true); // if modal, application will pause here
+				        System.out.println("Dialog closed");
+						JOptionPane.showMessageDialog(null, "You have been eliminated from the game.");
+						hasBeenEliminated = true;
+					}
 					setDarker(2);
 					setDarker(3);
 					setDarker(4);
